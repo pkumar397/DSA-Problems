@@ -34,26 +34,75 @@ vector<int> findMissingRepeatingNumbers(vector<int> a)
     //     return {repeated,missing};
 
     // Optimal Using Arthemetics (1st Apprach)
-    long long n = a.size();
-    long long SN = n * (n + 1) / 2;
-    long long S2N = (n * (n + 1) * (2 * n + 1)) / 6;
+    // long long n = a.size();
+    // long long SN = n * (n + 1) / 2;
+    // long long S2N = (n * (n + 1) * (2 * n + 1)) / 6;
 
-    long long S = 0, S2 = 0;
-    for (int i = 0; i < n; i++)
+    // long long S = 0, S2 = 0;
+    // for (int i = 0; i < n; i++)
+    // {
+    //     S += a[i];
+    //     S2 += (long long)a[i] * (long long)a[i];
+    // }
+
+    // long long val1 = S - SN;   // X-Y=S-SN
+    // long long val2 = S2 - S2N; // X2N-Y2N=S2-S2N
+
+    // val2 = val2 / val1; // X2N-Y2N=X+Y * X-Y
+    // long long x = (val1 + val2) / 2;
+    // long long y = (x - val1);
+    // return {int(x), int(y)};
+
+    // Optimal Second Apporoach Using Xor
+    int XOR = 0;
+    int n = a.size();
+    for (int i = 0; i < a.size(); i++)
     {
-        S += a[i];
-        S2 += (long long)a[i] * (long long)a[i];
+        XOR = XOR ^ a[i];
+        XOR ^= (i + 1);
     }
 
-    long long val1 = S - SN;   // X-Y=S-SN
-    long long val2 = S2 - S2N; // X2N-Y2N=S2-S2N
+    // finding the differentiating bit  100
+    int number = XOR & ~(XOR - 1);
+    // Step 3: Group the numbers:
+    int zero = 0;
+    int one = 0;
+    for (int i = 0; i < n; i++)
+    {
+        // part of 1 group:
+        if ((a[i] & number) != 0)
+        {
+            one = one ^ a[i];
+        }
+        // part of 0 group:
+        else
+        {
+            zero = zero ^ a[i];
+        }
+    }
 
-    val2 = val2 / val1; // X2N-Y2N=X+Y * X-Y
-    long long x = (val1 + val2) / 2;
-    long long y = (x - val1);
-    return {int(x), int(y)};
-
-    // Optimal Second Apporoach
+    for (int i = 1; i <= n; i++)
+    {
+        // part of 1 group:
+        if ((i & number) != 0)
+        {
+            one = one ^ i;
+        }
+        // part of 0 group:
+        else
+        {
+            zero = zero ^ i;
+        }
+    }
+    int cnt = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (a[i] == zero)
+            cnt++;
+    }
+    if (cnt == 2)
+        return {zero, one};
+    return {one, zero};
 }
 
 int main()
